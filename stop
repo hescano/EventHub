@@ -1,0 +1,2 @@
+docker stop event_hub 
+docker rm event_hub 

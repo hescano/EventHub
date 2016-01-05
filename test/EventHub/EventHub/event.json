@@ -1,0 +1,78 @@
+{
+  "events": {
+    "event": [
+      {
+        "event_header": {
+          "domain": "edu.byu",
+          "entity": "NotifyMe",
+          "event_type": "Test",
+          "source_dt": "2014-05-11T13:45:53.20Z",
+          "source_id": "3468493"
+        },
+        "filters": {
+          "filter": [
+            {
+              "filter_name": "college",
+              "filter_value": "1017"
+            },
+            {
+              "filter_name": "department",
+              "filter_value": "1326"
+            },
+            {
+              "filter_name": "year_term",
+              "filter_value": "20141"
+            },
+            {
+              "filter_name": "curriculum_id",
+              "filter_value": "06387"
+            },
+            {
+              "filter_name": "title_code",
+              "filter_value": "001"
+            },
+            {
+              "filter_name": "teaching_area",
+              "filter_value": "MATH"
+            },
+            {
+              "filter_name": "catalog_number",
+              "filter_value": "110"
+            },
+            {
+              "filter_name": "section_number",
+              "filter_value": "001"
+            }
+          ]
+        },
+        "event_body": {
+          "person_id": "585241162",
+          "student_name": "Ithaca, Bugs Bunny",
+          "year_term": "20141",
+          "curriculum_id": "06387",
+          "title_code": "001",
+          "section_number": "001",
+          "teaching_area": "MATH",
+          "catalog_number": "110",
+          "credit_hours": "3.0"
+        },
+        "history": [
+          {
+            "event_header": {
+              "domain": "edu.byu",
+              "entity": "MyMap",
+              "event_type": "Drop Class",
+              "source_dt": "2014-05-11T13:45:52.68Z",
+              "event_dt": "2014-05-11T13:45:53.09Z",
+              "source_id": "AB-45834",
+              "event_id":
+                "cfa6a732-dce9-2bac-3bc5-ad3cff657231",
+              "dispatch_id":
+                "bcd2e432-dfe8-3bcb-6a2a-ead9bbe586934"
+            }
+          }
+        ] 
+      }
+    ]
+  }
+}

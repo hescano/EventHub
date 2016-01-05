@@ -1,0 +1,8 @@
+D:\PROJECTS\EventHub\EventHub\bin\Debug\EventHub.exe
+D:\PROJECTS\EventHub\EventHub\bin\Debug\EventHub.pdb
+D:\PROJECTS\EventHub\EventHub\obj\Debug\EventHub.exe
+D:\PROJECTS\EventHub\EventHub\obj\Debug\EventHub.pdb
+D:\PROJECTS\EventHub\EventHub\bin\Debug\RabbitMQ.Client.dll
+D:\PROJECTS\EventHub\EventHub\bin\Debug\RabbitMQ.Client.xml
+D:\PROJECTS\EventHub\EventHub\bin\Debug\EventHub.exe.config
+D:\PROJECTS\EventHub\EventHub\bin\Debug\RabbitMQ.ServiceModel.dll

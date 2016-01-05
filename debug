@@ -1,0 +1,1 @@
+docker run -it -p 90:5000 --link some-rabbit:rabbitmq --name event_hub hub-tmp.byu.edu/durwin/event_hub:latest
