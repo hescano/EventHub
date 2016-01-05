@@ -1,0 +1,52 @@
+#!/usr/local/bin/python
+import requests
+import subprocess
+import post_to_slack
+import json
+import time
+import sys
+import os
+
+success_file = "/steps/deployment_tests_{}_passed".format(sys.argv[1])
+failure_file = "/steps/deployment_tests_{}_failed".format(sys.argv[1])
+
+# reset the result files
+subprocess.call("rm {} {}".format(success_file, failure_file), shell=True)
+
+response = requests.get("https://api.ghostinspector.com/v1/tests/{}/results/?apiKey={}".format(os.environ["GHOSTINSPECTOR_TEST_ID"], os.environ["GHOSTINSPECTOR_API_KEY"]))
+assert response.status_code == 200, "Not 200 Created, response code: {}".format(str(response.status_code))
+test_start_data = response.json()
+assert test_start_data['code'] == "SUCCESS", "the request to run the tests did not succeed.  details: {}".format(response.text)
+test_id = test_start_data['data']['_id']
+
+print "started the ghostinspector tests"
+
+done = False
+wait_seconds = 1
+while not done:
+    response = requests.get("https://api.ghostinspector.com/v1/tests/{}/results/?apiKey={}".format(os.environ["GHOSTINSPECTOR_TEST_ID"], os.environ["GHOSTINSPECTOR_API_KEY"]))
+    data = response.json()
+    try:
+        if data['data'][0]['_id'] == test_id:
+            done = True
+        else:
+            print "the tests are still running, sleeping for {} second(s) and trying again".format(wait_seconds)
+            time.sleep(wait_seconds)
+            wait_seconds += 1
+    except:
+        print "the tests haven't started running yet, sleeping for {} second(s) and trying again".format(wait_seconds)
+        time.sleep(wait_seconds)
+        wait_seconds += 1
+
+def send_message_to_slack(msg):
+    subprocess.check_call("./codeship/slack_say {}".format(msg), shell=True)
+
+if data['data'][0]['passing'] == "false":
+    subprocess.check_call("touch {}".format(failure_file), shell=True)
+    print data
+    send_message_to_slack("The ghostinspector tests failed")
+    revert_deployment()
+    sys.exit(1)
+else:
+    subprocess.check_call("touch {}".format(success_file), shell=True)
+

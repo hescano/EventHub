@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  labels:
+    app: eventhub
+    environment: prd
+  name: eventhub-prd-controller
+spec:
+  replicas: 2
+  selector:
+    app: eventhub
+    environment: prd
+    deployment: first
+  template:
+    metadata:
+      labels:
+        app: eventhub
+        environment: prd
+        deployment: first
+    spec:
+      containers:
+      - image: hubtmp.byu.edu/durwin/event_hub
+        imagePullPolicy: Always
+        name: eventhub
+        ports:
+        - containerPort: 5000
+          protocol: TCP
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+      - name: hubtmp-byu-edu-dockercfg
+      restartPolicy: Always

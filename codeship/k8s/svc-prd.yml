@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: eventhub
+    environment: prd
+  name: eventhub-prd
+spec:
+  ports:
+  - port: 5000
+    protocol: TCP
+  selector:
+    app: eventhub
+    environment: prd
+  type: LoadBalancer

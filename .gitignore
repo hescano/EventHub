@@ -1,0 +1,6 @@
+codeship/codeship.aes
+codeship/secrets.env
+codeship/dockercfg
+codeship/codeship_id_rsa
+.codeship-pipeline-quickstart-status
+

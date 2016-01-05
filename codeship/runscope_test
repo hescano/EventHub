@@ -1,0 +1,51 @@
+#!/usr/local/bin/python
+import requests
+import subprocess
+import json
+import time
+import sys
+import os
+
+success_file = "/steps/deployment_tests_{}_passed".format(sys.argv[1])
+failure_file = "/steps/deployment_tests_{}_failed".format(sys.argv[1])
+
+# reset the result files
+subprocess.call("rm {} {}".format(success_file, failure_file), shell=True)
+
+response = requests.get(os.environ["RUNSCOPE_TRIGGER_URL"])
+assert response.status_code == 201, "Not 201 Created, response code: {}".format(str(response.status_code))
+test_start_data = response.json()
+assert test_start_data['meta']['status'] == "success", "the request to run the tests did not succeed.  details: {}".format(response.text)
+
+print "started the runscope tests"
+
+done = False
+wait_seconds = 1
+while not done:
+    response = requests.get("https://api.runscope.com/buckets/{}/tests/{}/results/{}".format(os.environ["RUNSCOPE_BUCKET_ID"], os.environ["RUNSCOPE_TEST_ID"], test_start_data['data']['runs'][0]['test_run_id']), headers={"Authorization": "Bearer {}".format(os.environ["RUNSCOPE_BEARER_TOKEN"])})
+    data = response.json()
+    try:
+        if data['data']['result'] in ["pass", "fail"]:
+            done = True
+        else:
+            print "the tests are still running, sleeping for {} second(s) and trying again".format(wait_seconds)
+            time.sleep(wait_seconds)
+            wait_seconds += 1
+    except:
+        print "the tests haven't started running yet, sleeping for {} second(s) and trying again".format(wait_seconds)
+        time.sleep(wait_seconds)
+        wait_seconds += 1
+
+def send_message_to_slack(msg):
+    subprocess.check_call("./codeship/slack_say {}".format(msg), shell=True)
+
+if data['data']['result'] != "pass":
+    subprocess.check_call("touch {}".format(failure_file), shell=True)
+    print data
+    send_message_to_slack("runscope tests of {}:{}({}) failed".format(os.environ["CI_REPO_NAME"],os.environ["CI_BRANCH"],os.environ["CI_COMMIT_ID"]))
+    if os.environ["CI_BRANCH"] == "master":
+        send_message_to_slack("{}({}) broke {}:{}({})".format(os.environ["CI_COMMITTER_USERNAME"], os.environ["CI_COMMITTER_NAME"], os.environ["CI_REPO_NAME"], os.environ["CI_BRANCH"], os.environ["CI_COMMIT_ID"]))
+    sys.exit(1)
+else:
+    subprocess.check_call("touch {}".format(success_file), shell=True)
+

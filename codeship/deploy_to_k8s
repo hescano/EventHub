@@ -1,0 +1,29 @@
+#!/bin/bash -ex
+
+K8S_CLSTR=$1
+ENV=$2
+KUBECTL=./codeship/k8s/kubectl-$K8S_CLSTR
+NEW_IMAGE=$DOCKER_IMAGE:$CI_COMMIT_ID
+RC_NAME=$REPO_NAME-$ENV-controller
+
+# clean the deployment state files
+set +e
+rm /steps/deployment_failed_${K8S_CLSTR}_${ENV} /steps/deployment_succeeded_${K8S_CLSTR}_${ENV} /steps/old_image_name_${K8S_CLSTR}_${ENV}
+set -e
+
+# save the old image name in the /steps directory so that we can revert to it in the next script if the deployment fails
+$KUBECTL get rc -o json $RC_NAME | jq ".spec.template.spec.containers[0].image" | sed -e "s/\"//g" -e "s/ //g" > /steps/old_image_name_${K8S_CLSTR}_${ENV}
+echo -n "The old image is: "
+cat /steps/old_image_name_${K8S_CLSTR}_${ENV}
+
+# deploy with rolling update
+if ! $KUBECTL rolling-update $RC_NAME --image=$NEW_IMAGE; then
+    touch /steps/deployment_failed_${K8S_CLSTR}_${ENV}
+    ./codeship/slack_say "Deployment failed, rolling back..."
+    if ! $KUBECTL rolling-update $RC_NAME --image=`cat /steps/old_image_name_${K8S_CLSTR}_${ENV}`; then
+        ./codeship/slack_say "Deployment failed, and rollback failed, *MANUAL INTERVENTION REQUIRED* as users are now experiencing downtime."
+    fi
+    exit 1
+else
+    touch /steps/deployment_succeeded_${K8S_CLSTR}_${ENV}
+fi

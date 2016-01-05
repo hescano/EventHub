@@ -1,0 +1,17 @@
+#!/bin/bash -ex
+# This file is a wrapper around kubectl that tunnels kubectl commands to the on prem cluster through tabura.
+# The only thing it can't do yet that regular kubectl can is use yaml and json files because they won't be
+# on atom1-prd unless they are pushed there separately and before this script is run.
+
+SSH_KEY_FILE=~/.private_ssh_key
+if [ ! -f $SSH_KEY_FILE ]; then
+    set +x
+    echo -e $PRIVATE_SSH_KEY | base64 -d > $SSH_KEY_FILE
+    set -x
+    chmod 600 $SSH_KEY_FILE
+fi
+# This next line will open up an ssh tunnel through tabura to atom1-prd and then will close itself
+# after at least 10 seconds and at most at long as the ssh tunnel is being used.
+# credit to https://gist.github.com/scy/6781836
+ssh -f -o ExitOnForwardFailure=yes -o PasswordAuthentication=no -o StrictHostKeyChecking=no -i $SSH_KEY_FILE -p 22222 $SSH_USERNAME@tabura.byu.edu -L 20022:atom1-prd.byu.edu:22 sleep 10
+ssh -o PasswordAuthentication=no -o StrictHostKeyChecking=no -i $SSH_KEY_FILE -p 20022 dockeru@localhost kubectl $@

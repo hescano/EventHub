@@ -1,0 +1,7 @@
+#!/bin/bash
+
+CONF_FILE="/root/.kubectl_config_aws"
+if [ ! -f $CONF_FILE ]; then
+    echo -e $KUBECONFIG_AWS | base64 -d > $CONF_FILE
+fi
+kubectl --kubeconfig=$CONF_FILE $@

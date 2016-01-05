@@ -1,0 +1,12 @@
+data:
+  image: busybox
+  volumes:
+    - /tmp/steps:/steps
+    - /tmp/.docker:/root/.docker
+codeship_pipeline:
+  build:
+    dockerfile_path: codeship/Dockerfile-codeship
+  encrypted_env_file: codeship/secrets.env.encrypted
+  add_docker: true
+  volumes_from:
+    - data

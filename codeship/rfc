@@ -1,0 +1,93 @@
+#!/usr/local/bin/python
+import byu_ws_sdk as byu_ws
+import requests
+import datetime
+import json
+import SOAPpy
+import subprocess
+import os
+import sys
+
+rfc_state = {}
+rfc_state["submitted"] = 20
+rfc_state["finished"] = 50
+
+rfc_completion_rating = {}
+rfc_completion_rating['excellent'] = 1
+rfc_completion_rating['unsuccessful'] = 5
+
+def _get_now_str():
+    "Return the datetime in %Y-%m-%d %H:%M:%S format and in UTC because that's what ServiceNow expects"
+    return datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+
+def _slack_notify(msg):
+    subprocess.check_call("./codeship/slack_say \"{}\"".format(msg), shell=True)
+
+def _rfc_notify(rfc_change_sys_id, rfc_number, msg):
+    full_message = "%s deployment: <https://%s/nav_to.do?uri=change_request.do?sys_id=%s|%s> %s" % (os.environ["REPO_NAME"], "it.byu.edu", rfc_change_sys_id, rfc_number, msg)
+    _slack_notify(full_message)
+
+def create_rfc():
+    proxy = 'https://%s:%s@%s/Standard_Change.do?SOAP' % (os.environ["SERVICENOW_USERNAME"], os.environ["SERVICENOW_PASSWORD"], "it.byu.edu")
+    server = SOAPpy.SOAPProxy(proxy, 'http://www.service-now.com')
+    print "standard change template sys_id=>" + os.environ["SERVICENOW_RFC_TEMPLATE_ID"] + "<"
+    rfc = server.execute(template_id=os.environ["SERVICENOW_RFC_TEMPLATE_ID"], short_description="{} - {}".format(os.environ["CI_COMMIT_MESSAGE"], os.environ["CI_COMMIT_ID"]))
+    assert rfc.status == 'Inserted', "rfc.status isn't 'Inserted', it's {}".format(rfc.status)
+
+    now = _get_now_str()
+    print "standard change sys_id=>" + rfc.change_sys_id +  "<"
+    # state 20 is Submitted, ServiceNow has code that will automatically change that to 30 (Approved)
+    # for Standard RFCs
+    if not _update_rfc({'sys_id': rfc.change_sys_id, 'state': rfc_state["submitted"], 'work_start': now, 'u_requested_date': now}):
+        return False
+    _rfc_notify(rfc.change_sys_id, rfc.number, 'started')
+    open("/steps/rfc_change_sys_id", "w").write(rfc.change_sys_id)
+    open("/steps/rfc_number", "w").write(rfc.number)
+    return True
+
+def close_rfc():
+    rfc_change_sys_id = open("/steps/rfc_change_sys_id").read()
+    rfc_number = open("/steps/rfc_number").read()
+    now = _get_now_str()
+    success = _update_rfc({'sys_id': rfc_change_sys_id, 'state': rfc_state['finished'], 'work_end': now, 'u_completion_rating': rfc_completion_rating['excellent']})
+    if success:
+        _rfc_notify(rfc_change_sys_id, rfc_number, 'closed successfully')
+    return success
+
+def fail_rfc():
+    rfc_change_sys_id = open("/steps/rfc_change_sys_id").read()
+    rfc_number = open("/steps/rfc_number").read()
+    msg = sys.argv[2]
+    now = _get_now_str()
+    success = _update_rfc({
+            'sys_id': rfc_change_sys_id,
+            'state': rfc_state['finished'],
+            'work_end': now,
+            'u_failure_start': now,
+            'u_failure_end': now,
+            'u_task_work_log': msg,
+            'u_completion_rating': rfc_completion_rating['unsuccessful']})
+    if success:
+        _rfc_notify(rfc_change_sys_id, rfc_number, 'closed as failure')
+    return success
+
+def _update_rfc(parameters):
+    headers = {'Content-Type': 'application/json',
+               'Accept': 'application/json'}
+    response = requests.put("https://byu.service-now.com/api/now/table/change_request/{}".format(parameters['sys_id']),
+        headers=headers, auth=(os.environ["SERVICENOW_USERNAME"], os.environ["SERVICENOW_PASSWORD"]), json=parameters)
+    response.raise_for_status()
+    return True
+
+def main():
+    if sys.argv[1] == "open":
+        create_rfc()
+    elif sys.argv[1] == "close":
+        close_rfc()
+    elif sys.argv[1] == "fail":
+        fail_rfc()
+    else:
+        sys.stderr.write("Invalid command '{}', must be one of 'open', 'close' or 'fail'.\n".format(sys.argv[1]))
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,33 @@
+- service: codeship_pipeline
+  encrypted_dockercfg_path: ./codeship/dockercfg.encrypted
+  type: serial
+  steps:
+  - command: ./codeship/slack_say "Starting pipeline"
+  - command: ./codeship/build_and_push
+  - command: ./codeship/unittest
+  - type: parallel
+    name: deploy_to_k8s_tst
+    steps:
+    - command: ./codeship/deploy_to_k8s aws tst
+    - command: ./codeship/deploy_to_k8s lcl tst
+  - command: ./codeship/runscope_test tst
+  #- command: ./codeship/ghostinspector_test tst
+  - type: parallel
+    name: if_tests_failed_rollback_tst
+    steps:
+    - command: ./codeship/if_tests_failed_rollback aws tst
+    - command: ./codeship/if_tests_failed_rollback lcl tst
+  #- command: ./codeship/rfc open
+  - type: parallel
+    name: deploy_to_k8s_prd
+    steps:
+    - command: ./codeship/deploy_to_k8s aws prd
+    - command: ./codeship/deploy_to_k8s lcl prd
+  - command: ./codeship/runscope_test prd
+  #- command: ./codeship/ghostinspector_test prd
+  - type: parallel
+    name: if_tests_failed_rollback_prd
+    steps:
+    - command: ./codeship/if_tests_failed_rollback aws prd
+    - command: ./codeship/if_tests_failed_rollback lcl prd
+  #- command: ./codeship/rfc close

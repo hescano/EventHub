@@ -1,0 +1,15 @@
+#!/bin/bash -ex
+
+mkdir -p ~/.ssh/
+set +x
+echo -e $PRIVATE_SSH_KEY | base64 -d > ~/.ssh/codeship_id_rsa
+set -x
+chmod 600 ~/.ssh/codeship_id_rsa
+
+scp -i ~/.ssh/codeship_id_rsa -P 22222 -o StrictHostKeyChecking=no <your deployable artifact> $SSH_USERNAME@tabura.byu.edu:~
+
+ssh -i ~/.ssh/codeship_id_rsa -p 22222 -o StrictHostKeyChecking=no <your deployable artifact> $SSH_USERNAME@tabura.byu.edu << TABURA_EOF
+scp -P 22222 <your deployable artifact> tomcatft@slice1-stg.byu.edu:/var/lib/tomcat/webapps/
+scp -P 22222 <your deployable artifact> tomcatft@slice2-stg.byu.edu:/var/lib/tomcat/webapps/
+#TODO remove all the but the latest deployable artificts
+TABURA_EOF

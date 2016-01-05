@@ -1,0 +1,15 @@
+#!/bin/bash -ex
+
+K8S_CLSTR=$1
+ENV=$2
+KUBECTL=./codeship/k8s/kubectl-$K8S_CLSTR
+RC_NAME=$REPO_NAME-$ENV-controller
+
+if [ -e "/steps/deployment_tests_${K8S_CLSTR}_${ENV}_failed" ]; then
+    if ! $KUBECTL rolling-update $RC_NAME --image=`cat /steps/old_image_name_${K8S_CLSTR}_${ENV}`; then
+        ./codeship/slack_say "@channel: Tests failed and rollback failed. *MANUAL INTERVENTION REQUIRED* as users are now experiencing downtime."
+        exit 1
+    else
+        ./codeship/slack_say "Tests failed and rollback succeeded."
+    fi
+fi
