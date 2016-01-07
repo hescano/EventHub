@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -19,7 +19,8 @@ namespace EventHub
                 Int32 port = 5000;
 
                 string address = Dns.GetHostEntry(Dns.GetHostName()).AddressList.Where(o => o.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork).First().ToString();
-                string mq_address = System.Environment.GetEnvironmentVariable("RABBIT");
+                //string mq_address = System.Environment.GetEnvironmentVariable("RABBIT");
+                string mq_address = "notifyme-rabbit-tst:5672";
 
                 if (mq_address == null)
                 {
@@ -38,7 +39,7 @@ namespace EventHub
                 Console.WriteLine("RABBIT:" + mq_address);
 
                 Rabbit mq = new Rabbit(mq_address);
-                
+
 
                 Console.WriteLine("IP ADDRESS:" + address);
                 IPAddress localAddr = IPAddress.Parse(address);
