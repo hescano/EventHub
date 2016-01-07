@@ -19,7 +19,7 @@ namespace EventHub
                 Int32 port = 5000;
 
                 string address = Dns.GetHostEntry(Dns.GetHostName()).AddressList.Where(o => o.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork).First().ToString();
-                string mq_address = System.Environment.GetEnvironmentVariable("RABBIT");
+                string mq_address = "notifyme-rabbit-tst:5672"; //System.Environment.GetEnvironmentVariable("RABBIT");
 
                 if (mq_address == null)
                 {
