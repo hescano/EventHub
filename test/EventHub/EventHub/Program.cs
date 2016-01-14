@@ -20,7 +20,7 @@ namespace EventHub
 
                 string address = Dns.GetHostEntry(Dns.GetHostName()).AddressList.Where(o => o.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork).First().ToString();
                 //string mq_address = System.Environment.GetEnvironmentVariable("RABBIT");
-                string mq_address = "eventhub-rabbit-tst:5672";
+                string mq_address = "eventhub-rabbit-tst";
 
                 if (mq_address == null)
                 {
