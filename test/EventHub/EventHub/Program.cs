@@ -12,16 +12,17 @@ namespace EventHub
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("STARTING NOTIFY_ME_API");
+            Console.WriteLine("STARTING EVENT HUB");
 
             try
             {
+		Console.WriteLine("TEST");
                 Int32 port = 5000;
-
-                string address = Dns.GetHostEntry(Dns.GetHostName()).AddressList.Where(o => o.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork).First().ToString();
+                
+		string address = Dns.GetHostEntry(Dns.GetHostName()).AddressList.Where(o => o.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork).First().ToString();
                 //string mq_address = System.Environment.GetEnvironmentVariable("RABBIT");
-		string mq_address = "aeac0fd9bbf9811e5b72702febfcef87-190293316.us-west-2.elb.amazonaws.com";
-//                string mq_address = "eventhub-rabbit-tst";
+		string mq_address = "evetnhub-rabbit-tst";
+		//string mq_address = "aeac0fd9bbf9811e5b72702febfcef87-190293316.us-west-2.elb.amazonaws.com";
 
                 if (mq_address == null)
                 {
