@@ -61,7 +61,7 @@ namespace EventHub
                     // Perform a blocking call to accept requests.
                     // You could also user server.AcceptSocket() here.
                     TcpClient client = _server.AcceptTcpClient();      
-                    Console.WriteLine("Connected!");
+                    Console.WriteLine("Connected! " + DateTime.Now.ToString());
 
                     json = null;
                     old_json = "";
@@ -89,13 +89,13 @@ namespace EventHub
                         }
                     } while (i == 256);
 
-                    //Console.WriteLine("DATA=" + data.ToString());
+                    Console.WriteLine("DATA=" + data.ToString());
 
                     try
                     {
 
                         int payload_start = data.ToString().IndexOf("\r\n\r\n");
-                        //Console.WriteLine("PAYLOAD START AT:" + payload_start.ToString());
+                        Console.WriteLine("PAYLOAD START AT:" + payload_start.ToString());
 
                         if (payload_start == -1)
                             header_text = data.ToString();
@@ -287,7 +287,7 @@ namespace EventHub
                     {
                         Console.WriteLine("ERROR:" + x.Message);
                         Console.WriteLine("JSON=\r\n" + old_json);
-                        response = string.Format("HTTP/1.1 {0}\nDate: {1}\n\n", x.Message, DateTime.Now.ToString());
+                        response = string.Format("HTTP/1.1 500 {0}\nDate: {1}\n\n", x.Message, DateTime.Now.ToString());
                         hdr = System.Text.Encoding.ASCII.GetBytes(response);
                         stream.Write(hdr, 0, hdr.Length);
                     }
