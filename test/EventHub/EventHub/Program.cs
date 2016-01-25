@@ -22,8 +22,8 @@ namespace EventHub
 		string address = Dns.GetHostEntry(Dns.GetHostName()).AddressList.Where(o => o.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork).First().ToString();
                 //string mq_address = System.Environment.GetEnvironmentVariable("RABBIT");
 		//string mq_address = "eventhub-rabbit-tst";
-		//string mq_address = "ab93e749bc07d11e5aca9023200705d6-1500000672.us-west-2.elb.amazonaws.com";
-		string mq_address = "event-hub.devops.byu.edu";
+		string mq_address = "ab93e749bc07d11e5aca9023200705d6-1500000672.us-west-2.elb.amazonaws.com";
+		//string mq_address = "event-hub.devops.byu.edu";
                 if (mq_address == null)
                 {
                     if (Type.GetType("Mono.Runtime") != null)
