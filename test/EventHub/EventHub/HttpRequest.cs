@@ -82,13 +82,15 @@ namespace EventHub
                             if (i==0)
                             {
                                 Console.WriteLine("PINGED");
+                                client.Close();
                                 continue;
                             }
                         }
                         catch (Exception x)
                         {
                             Console.WriteLine("PROBLEM WITH READ");
-                            break;
+                            client.Close();
+                            continue;
                         }
                     } while (i == 256);
 
@@ -286,9 +288,9 @@ namespace EventHub
                             throw new Exception("404 Not Found");
                         }
 
-                        Console.WriteLine("DEBUG 4.3");
+                        Console.Write("TESTING FUNCTION " + function);
                         msg = functions[function](json, headers, parameters);
-                        Console.WriteLine("DEBUG 4.4");
+                        Console.WriteLine(" ....DONE");
 
                         string reply;
                         if (msg.json == null)
@@ -307,7 +309,7 @@ namespace EventHub
                     {
                         Console.WriteLine("ERROR:" + x.Message);
                         Console.WriteLine("JSON=\r\n" + old_json);
-                        response = string.Format("HTTP/1.1 500 {0}\nDate: {1}\n\n", x.Message, DateTime.Now.ToString());
+                        response = string.Format("HTTP/1.1 {0}\nDate: {1}\n\n", x.Message, DateTime.Now.ToString());
                         hdr = System.Text.Encoding.ASCII.GetBytes(response);
                         stream.Write(hdr, 0, hdr.Length);
                     }
