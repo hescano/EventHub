@@ -295,9 +295,19 @@ namespace EventHub
                         old_json = json;
 
                         string function = headers["Method"] + headers["Path"].Replace("/", "_");
+
+                        Console.WriteLine("DEBUG 4.1[" + function + "]");
+
+
                         if (!functions.ContainsKey(function))
+                        {
+                            Console.WriteLine("DEBUG 4.2 Function Not Found");
                             throw new Exception("404 Not Found");
+                        }
+
+                        Console.WriteLine("DEBUG 4.3");
                         msg = functions[function](json, headers, parameters);
+                        Console.WriteLine("DEBUG 4.4");
 
                         string reply;
                         if (msg.json == null)
