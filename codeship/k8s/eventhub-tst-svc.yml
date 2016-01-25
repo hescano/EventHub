@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: eventhub
+    environment: tst
+  name: eventhub-tst
+spec:
+  ports:
+  - port: 5000
+    protocol: TCP
+    name: rest-port
+  selector:
+    app: eventhub 
+    environment: tst
+  type: LoadBalancer

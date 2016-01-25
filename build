@@ -1,1 +1,1 @@
-docker build -t hub-tmp.byu.edu/durwin/event_hub .
+docker build -t hubtmp.byu.edu/durwin/event_hub .

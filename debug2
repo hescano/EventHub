@@ -1,0 +1,1 @@
+docker run -it -p 90:5000 --name event_hub hubtmp.byu.edu/durwin/event_hub:latest

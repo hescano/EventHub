@@ -18,7 +18,7 @@ RUN cp /var/www/html/test/EventHub/EventHub/RabbitMQ.Client.dll /usr/lib/mono/4.
 
 RUN xbuild /var/www/html/test/EventHub/EventHub.sln
 
-EXPOSE 5000
+EXPOSE 80
 
 WORKDIR /var/www/html/test/EventHub/EventHub/bin/Debug
 
