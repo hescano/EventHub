@@ -17,7 +17,7 @@ namespace EventHub
             try
             {
 		Console.WriteLine("TEST");
-                Int32 port = 5000;
+                Int32 port = 80;
                 
 		string address = Dns.GetHostEntry(Dns.GetHostName()).AddressList.Where(o => o.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork).First().ToString();
                 //string mq_address = System.Environment.GetEnvironmentVariable("RABBIT");
