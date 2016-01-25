@@ -173,23 +173,33 @@ namespace EventHub
 
                         try
                         {
+                            Console.WriteLine("DEBUG 1");
                             JWT jwt = new JWT(headers["X-JWT-Assertion"]);
                             if (jwt.isValid)
                             {
+                                Console.WriteLine("DEBUG 1.1");
                                 headers.Add("Entity", jwt.entity);
                                 headers.Add("Queue", jwt.queue);
                             }
                             else
+                            {
+                                Console.WriteLine("DEBUG 1.2");
                                 throw new Exception("401 Not Authorized");
+                            }
                         }
                         catch (Exception x)
                         {
+                            Console.WriteLine("DEBUG 1.2");
                             if (payload_start != 999999)
+                            {
+                                Console.WriteLine("DEBUG 1.3");
                                 throw new Exception("401 Not Authorized");
+                            }
                             else
                             {
-//                                headers.Add("Entity", "PRO");
-//                                headers.Add("Queue", "415212202");
+                                Console.WriteLine("DEBUG 1.4");
+                                //                                headers.Add("Entity", "PRO");
+                                //                                headers.Add("Queue", "415212202");
                                 headers.Add("Entity", "Hannig");
                                 headers.Add("Queue", "389206472");
                             }
@@ -197,14 +207,18 @@ namespace EventHub
 
                         try
                         {
+                            Console.WriteLine("DEBUG 2.0");
+
                             if (headers["Transfer-Encoding"].Equals("chunked"))
                             {
+                                Console.WriteLine("DEBUG 2.1");
                                 json = "";
                                 int length;
                                 payload_start += 2;
 
                                 do
                                 {
+                                    Console.WriteLine("DEBUG 2.2");
                                     string size = data.ToString().Substring(payload_start + 2);
 
                                     size = size.Substring(0, size.IndexOf("\r\n"));
@@ -213,6 +227,7 @@ namespace EventHub
                                     //Console.WriteLine("CHUNK SIZE=" + length.ToString());
                                     if (length > 0)
                                     {
+                                        Console.WriteLine("DEBUG 2.3");
                                         payload_start += size.Length + 4;
                                         json += data.ToString().Substring(payload_start, length);
                                         payload_start += length;
@@ -223,13 +238,17 @@ namespace EventHub
                         }
                         catch (Exception x)
                         {
+                            Console.WriteLine("DEBUG 2.4");
                             //Console.WriteLine("NOT CHUNKED");
                         }
 
+                        Console.WriteLine("DEBUG 3.0");
                         if (json == null)
                         {
+                            Console.WriteLine("DEBUG 3.1");
                             if (payload_start > 1)
                             {
+                                Console.WriteLine("DEBUG 3.2");
                                 json = data.ToString().Substring(payload_start + 4);
 
                                 if (json.Length == 0)
@@ -238,31 +257,41 @@ namespace EventHub
                                     throw new Exception("400 Bad Request");
                             }
 
+                            Console.WriteLine("DEBUG 3.3");
                             //Console.WriteLine("PAYLOAD:\r\n" + json);
                         }
-                            
+
+
+                        Console.WriteLine("DEBUG 3.4");
+
                         if (json != null)
                         {
+                            Console.WriteLine("DEBUG 3.5");
                             if (json.Length == 0)
                             {
+                                Console.WriteLine("DEBUG 3.6");
                                 json = null;
                             }
                             else
                             {
                                 try
                                 {
+                                    Console.WriteLine("DEBUG 3.7");
                                     if (!headers["Content-Type"].Contains("json"))
                                     {
+                                        Console.WriteLine("DEBUG 3.8");
                                         throw new Exception("400 Bad Request");
                                     }
                                 }
                                 catch (Exception x)
                                 {
+                                    Console.WriteLine("DEBUG 3.9");
                                     throw new Exception("400 Bad Request");
                                 }
                             }
                         }
 
+                        Console.WriteLine("DEBUG 4.0");
                         old_json = json;
 
                         string function = headers["Method"] + headers["Path"].Replace("/", "_");
