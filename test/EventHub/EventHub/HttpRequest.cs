@@ -79,21 +79,20 @@ namespace EventHub
                             i = stream.Read(bytes, 0, bytes.Length);
                             // Translate data bytes to a ASCII string.
                             data.Append(System.Text.Encoding.ASCII.GetString(bytes, 0, i));
-                            if (i==0)
-                            {
-                                Console.WriteLine("PINGED");
-                                client.Close();
-                                continue;
-                            }
                         }
                         catch (Exception x)
                         {
                             Console.WriteLine("PROBLEM WITH READ");
-                            client.Close();
-                            continue;
+                            i = 0;
                         }
                     } while (i == 256);
 
+                    if (i == 0)
+                    {
+                        Console.WriteLine("PINGED");
+                        client.Close();
+                        continue;
+                    }
                     //Console.WriteLine("DATA=" + data.ToString());
 
                     try

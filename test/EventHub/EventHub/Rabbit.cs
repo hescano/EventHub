@@ -41,7 +41,7 @@ namespace EventHub
             cf.Port = _data_port;
             conn = cf.CreateConnection();
             ch = conn.CreateModel();
-            conn.AutoClose = true;
+            conn.AutoClose = false;
         }
 
         public class Response

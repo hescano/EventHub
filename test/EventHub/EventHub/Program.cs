@@ -61,6 +61,8 @@ namespace EventHub
                 Console.WriteLine("Cannot Connet to RabbitMQ [" + x.Message + "]");
             }
 
+            Console.WriteLine("PROGRAM ENDED");
         }
+
     }
 }
